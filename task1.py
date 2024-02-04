@@ -1,7 +1,7 @@
 import random
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
+from Crypto.Util.Padding import pad, unpad
 
 def dhke(alpha, q):
     x = random.randint(1, q)
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # hash the mod values
     keyA = sha_hash(str(sA), 16)
     keyB = sha_hash(str(sB), 16)
-    
+        
     # write message
     mA = "This is a secret."
     mB = "I'm trying to deliver a message."
@@ -59,4 +59,12 @@ if __name__ == "__main__":
     pB = pad(mB.encode('utf-8'), AES.block_size, style='pkcs7')
     eB = cB.encrypt(pB)
         
+    # decrypt eA
+    dA = cB.decrypt(eA)
+    uA = unpad(dA, AES.block_size, style='pkcs7').decode('utf-8')
+    print(uA)
     
+    # decrypt eB
+    dB = cA.decrypt(eB)
+    uB = unpad(dB, AES.block_size, style='pkcs7').decode('utf-8')
+    print(uB)
