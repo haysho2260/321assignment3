@@ -35,11 +35,14 @@ if __name__ == "__main__":
     xB, yB = dhke(int(alpha.replace(" ", ""), 16), int(q.replace(" ", ""), 16))
 
     # mallory attack - modify public key (YA) to YA→q
-    yA = pow(yA, random.randint(1, int(q.replace(" ", ""), 16)), int(q.replace(" ", ""), 16))
-    yB = pow(yB, random.randint(1, int(q.replace(" ", ""), 16)), int(q.replace(" ", ""), 16))
+    random_exponent = random.randint(1, int(q.replace(" ", ""), 16))
+    yA_mal = pow(yA, random_exponent, int(q.replace(" ", ""), 16))
+    yB_mal = pow(yB, random_exponent, int(q.replace(" ", ""), 16))
 
-    sA = pow(yB, xA, int(q.replace(" ", ""), 16))
-    sB = pow(yA, xB, int(q.replace(" ", ""), 16))
+    # A sends her encrypted message to B using A's 
+    # private key xA and Mallory's public key
+    sA = pow(yB_mal, xA, int(q.replace(" ", ""), 16))
+    sB = pow(yA_mal, xB, int(q.replace(" ", ""), 16))
 
     # hash the mod values
     keyA = sha_hash(str(sA), 16)
