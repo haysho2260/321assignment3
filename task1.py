@@ -2,6 +2,7 @@ import random
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
 
 def dhke(alpha, q):
     x = random.randint(1, q)
@@ -40,27 +41,31 @@ if __name__ == "__main__":
     # hash the mod values
     keyA = sha_hash(str(sA), 16)
     keyB = sha_hash(str(sB), 16)
-        
+                
     # write message
     mA = "This is a secret."
     mB = "I'm trying to deliver a message."
 
+    iv = get_random_bytes(16)
+
     # generate cipher, pad text, and encrypt
-    cA = AES.new(keyA.encode('utf-8'), AES.MODE_ECB)
+    cA = AES.new(keyA.encode('utf-8'), AES.MODE_CBC, iv)
     pA = pad(mA.encode('utf-8'), AES.block_size, style='pkcs7')
     eA = cA.encrypt(pA)
     
     # generate cipher, pad text, and encrypt
-    cB = AES.new(keyB.encode('utf-8'), AES.MODE_ECB)
+    cB = AES.new(keyB.encode('utf-8'), AES.MODE_CBC, iv)
     pB = pad(mB.encode('utf-8'), AES.block_size, style='pkcs7')
     eB = cB.encrypt(pB)
         
-    # decrypt eA
-    dA = cB.decrypt(eA)
+    # Decrypt eA
+    cA_decrypt = AES.new(keyA.encode('utf-8'), AES.MODE_CBC, iv)
+    dA = cA_decrypt.decrypt(eA)
     uA = unpad(dA, AES.block_size, style='pkcs7').decode('utf-8')
-    print(uA)
+    print("Decrypted message from A:", uA)
     
-    # decrypt eB
-    dB = cA.decrypt(eB)
+    # Decrypt eB
+    cB_decrypt = AES.new(keyB.encode('utf-8'), AES.MODE_CBC, iv)
+    dB = cB_decrypt.decrypt(eB)
     uB = unpad(dB, AES.block_size, style='pkcs7').decode('utf-8')
-    print(uB)
+    print("Decrypted message from B:", uB)
