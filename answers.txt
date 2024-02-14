@@ -27,6 +27,17 @@ task. One must pick a primitive root modulo q that don't include these special v
 It would be good to make sure that the modulo function don't include small prime 
 modulus and fixed or weak generators (like 0).
 
+For the last part of task 2, if Mallory wants to create a valid signature for a third message, m3 = m1 * m2, she can use malleability. The reasoning for this can be found below
+
+Signature 3 = (m1 * m2)^d mod n
+= (m1^d * m2^d) mod n
+= (m1^d mod n * m2^d mod n) mod n
+= signature1 * signature2 mod n
+
+This step = (m1^d mod n * m2^d mod n) mod n involved a modular multiplication property. When you multiple two numbers each of which has been modulod by n, then the product of those two numbers needs to modulod by n to avoid overflow.
+
+As a result, you can get a valid signature 3 if (signature1 * signature2) mod n
+
 4. For task 3 part 1, while it’s very common for many people to use the same
 value for e in their key (common values are 3, 7, 216+1), it is very bad if two
 people use the same RSA modulus n. Briefly describe why this is, and what
